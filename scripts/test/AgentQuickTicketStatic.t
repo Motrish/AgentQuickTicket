@@ -11,6 +11,11 @@ my $Root = File::Spec->rel2abs( File::Spec->catdir( $Bin, '..', '..' ) );
 
 my @Required = qw(
     AgentQuickTicket.sopm
+    README.md
+    doc/README.md
+    doc/INSTALL.md
+    doc/ADMIN.md
+    doc/CHANGELOG.md
     Kernel/Config/Files/XML/AgentQuickTicket.xml
     Kernel/Language/de_AgentQuickTicket.pm
     Kernel/Language/en_AgentQuickTicket.pm

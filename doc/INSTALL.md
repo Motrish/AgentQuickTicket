@@ -11,13 +11,14 @@ bin/otobo.Console.pl Dev::Package::Build \
   /tmp
 ```
 
-The result is `/tmp/AgentQuickTicket-1.0.7.opm`.
+The result is `/tmp/AgentQuickTicket-1.0.8.opm`.
 
 ## Install
 
 ```bash
-bin/otobo.Console.pl Admin::Package::Install /tmp/AgentQuickTicket-1.0.7.opm
+bin/otobo.Console.pl Admin::Package::Install /tmp/AgentQuickTicket-1.0.8.opm
 bin/otobo.Console.pl Maint::Config::Rebuild
+bin/otobo.Console.pl Maint::Cache::Delete
 ```
 
 Restart or refresh the agent browser session after the package install. The admin menu entry is under `Ticket` as `Quick ticket profiles`.
@@ -35,4 +36,4 @@ The demo expects the OTOBO objects from the concept: CustomerUserID `11443146`, 
 
 The package declares OTOBO framework compatibility for 11.0.x and 11.2.x. The source was syntax-checked against OTOBO 11.0 and 11.2 APIs. A live browser/database test still needs to be run on the target instance.
 
-There is intentionally no `CustomerFrontend` registration. Uninstalling the package does not delete profile data automatically; export or remove the two plugin tables according to the local change-management policy.
+There is intentionally no `CustomerFrontend` registration. The package definition removes the two plugin tables during uninstall; export or document the profiles before removing the package.

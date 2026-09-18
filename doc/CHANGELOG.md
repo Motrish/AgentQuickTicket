@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.8
+
+- Rewrite the user documentation with installation, configuration, placeholders, troubleshooting, security and operational guidance.
+
 ## 1.0.7
 
 - Merge the German plugin translations into OTOBO's existing language catalog.
