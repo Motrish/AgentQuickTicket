@@ -34,7 +34,6 @@ Die Plugin-Metadaten lauten:
 | Eigenschaft | Wert |
 |---|---|
 | Name | AgentQuickTicket |
-| Vendor | Michael Nehmer \| Motrish |
 | Repository | https://github.com/Motrish/AgentQuickTicket |
 | Lizenz | GNU General Public License v3 |
 
@@ -376,7 +375,6 @@ node --check var/httpd/htdocs/js/Core.Agent.Admin.AgentQuickTicket.js
 ## Support und Repository
 
 - Repository: https://github.com/Motrish/AgentQuickTicket
-- Vendor: Michael Nehmer | Motrish
 - Lizenz: GNU GPLv3
 - Changelog: [`doc/CHANGELOG.md`](doc/CHANGELOG.md)
 - Administrationsdetails: [`doc/ADMIN.md`](doc/ADMIN.md)
