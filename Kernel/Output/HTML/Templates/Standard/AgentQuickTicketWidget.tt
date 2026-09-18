@@ -1,0 +1,13 @@
+<div id="AgentQuickTicketWidget" class="WidgetSimple AgentQuickTicketWidget Hidden" data-agent-quick-ticket-widget="1">
+    <div class="Header">
+        <h2><i class="fa fa-bolt"></i> [% Translate("Quick tickets") | html %]</h2>
+    </div>
+    <div class="Content">
+        <p class="AgentQuickTicketHint" data-role="hint">[% Translate("Please select a customer user first.") | html %]</p>
+        <div class="AgentQuickTicketMessage Hidden" data-role="message" role="status"></div>
+        <div class="AgentQuickTicketButtons" data-role="buttons"></div>
+        <div class="AgentQuickTicketLoading Hidden" data-role="loading">
+            <i class="fa fa-spinner fa-spin"></i> [% Translate("Loading quick tickets...") | html %]
+        </div>
+    </div>
+</div>

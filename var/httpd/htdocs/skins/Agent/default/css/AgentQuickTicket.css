@@ -1,0 +1,107 @@
+/* AgentQuickTicket widget and administration styles. */
+
+.AgentQuickTicketWidget .Content {
+    padding-top: 0.5em;
+}
+
+.AgentQuickTicketWidget .AgentQuickTicketHint,
+.AgentQuickTicketWidget .AgentQuickTicketLoading {
+    color: #666;
+}
+
+.AgentQuickTicketWidget .AgentQuickTicketButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45em;
+}
+
+.AgentQuickTicketButton {
+    border: 0;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    gap: 0.45em;
+    min-height: 2.3em;
+    align-items: center;
+    padding: 0.45em 0.75em;
+}
+
+.AgentQuickTicketButton:hover,
+.AgentQuickTicketButton:focus {
+    filter: brightness(0.92);
+}
+
+.AgentQuickTicketButton--Primary { background: #337ab7; }
+.AgentQuickTicketButton--Success { background: #398439; }
+.AgentQuickTicketButton--Warning { background: #ec971f; }
+.AgentQuickTicketButton--Danger { background: #d43f3a; }
+.AgentQuickTicketButton--Info { background: #269abc; }
+.AgentQuickTicketButton--Neutral { background: #777; }
+
+.AgentQuickTicketWidget [data-role="message"].Error,
+.AgentQuickTicketTestResult.Error,
+.AgentQuickTicketAdmin .MessageBox.Error {
+    color: #a94442;
+}
+
+.AgentQuickTicketWidget [data-role="message"].Success,
+.AgentQuickTicketTestResult.Success {
+    color: #3c763d;
+}
+
+.AgentQuickTicketActions {
+    white-space: nowrap;
+}
+
+.AgentQuickTicketActions a {
+    display: inline-block;
+    margin-right: 0.6em;
+}
+
+.AgentQuickTicketFieldTable td,
+.AgentQuickTicketFieldTable th {
+    vertical-align: top;
+}
+
+.AgentQuickTicketFieldTable td:first-child {
+    width: 18%;
+}
+
+.AgentQuickTicketDynamicFieldToolbar {
+    margin-bottom: 0.75em;
+}
+
+.AgentQuickTicketDynamicFieldRow td {
+    vertical-align: top;
+}
+
+.AgentQuickTicketDynamicFieldRow button {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.AgentQuickTicketAdmin .FieldHelp {
+    color: #666;
+    margin-top: 0.35em;
+}
+
+.AgentQuickTicketAdmin .CheckboxLabel {
+    display: block;
+    margin: 0.35em 0;
+}
+
+.AgentQuickTicketTestResult {
+    border-left: 4px solid #999;
+    margin-top: 1em;
+    padding: 0.5em 0.75em;
+}
+
+.AgentQuickTicketTestResult.Success {
+    border-left-color: #398439;
+}
+
+.AgentQuickTicketTestResult.Error {
+    border-left-color: #d43f3a;
+}

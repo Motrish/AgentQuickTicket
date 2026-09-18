@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otobo_package version="1.1">
+    <Name>AgentQuickTicket</Name>
+    <Version>1.0.7</Version>
+    <Vendor>Michael Nehmer | Motrish</Vendor>
+    <URL>https://github.com/Motrish/AgentQuickTicket</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
+    <Framework>11.0.x</Framework>
+    <Framework>11.2.x</Framework>
+    <PackageIsVisible>1</PackageIsVisible>
+    <PackageIsDownloadable>1</PackageIsDownloadable>
+    <PackageIsRemovable>1</PackageIsRemovable>
+    <PackageAllowDirectUpdate>1</PackageAllowDirectUpdate>
+    <Description Lang="en">Configurable agent quick ticket profiles for AgentTicketPhone.</Description>
+    <Description Lang="de">Konfigurierbare Schnellticket-Profile für AgentTicketPhone.</Description>
+    <ChangeLog Date="2026-09-18" Version="1.0.7">Merge the German AgentQuickTicket translations into the existing OTOBO catalog instead of replacing all core translations.</ChangeLog>
+    <ChangeLog Date="2026-09-18" Version="1.0.6">Keep the German language extension plugin-specific and translate AgentQuickTicket validation and AJAX messages without overriding OTOBO core translations.</ChangeLog>
+    <ChangeLog Date="2026-09-18" Version="1.0.5">Keep article-text profiles on the current AgentTicketPhone form so CKEditor does not restore the screen default during the prefill refresh.</ChangeLog>
+    <ChangeLog Date="2026-09-18" Version="1.0.4">Preserve profile values during AgentTicketPhone prefill refresh, synchronize the article text with CKEditor and improve ResolveProfile error reporting.</ChangeLog>
+    <ChangeLog Date="2026-09-18" Version="1.0.3">Initialize admin controls and the AgentTicketPhone widget in OTOBO's APP_MODULE lifecycle so the dynamic-field editor and widget are active after configuration loading.</ChangeLog>
+    <ChangeLog Date="2026-09-18" Version="1.0.2">Rebuild the distributable with the exact OTOBO PackageBuild element and attribute order.</ChangeLog>
+    <ChangeLog Date="2026-09-18" Version="1.0.1">Fix package metadata and lifecycle declarations for reliable installation through the OTOBO package manager.</ChangeLog>
+    <ChangeLog Version="1.0.0">Initial release: admin CRUD, AgentTicketPhone widget, server-side validation, placeholders and demo profile.</ChangeLog>
+
+    <Filelist>
+        <File Permission="644" Location="Kernel/Config/Files/XML/AgentQuickTicket.xml" />
+        <File Permission="644" Location="Kernel/Language/de_AgentQuickTicket.pm" />
+        <File Permission="644" Location="Kernel/Language/en_AgentQuickTicket.pm" />
+        <File Permission="644" Location="Kernel/Modules/AdminAgentQuickTicket.pm" />
+        <File Permission="644" Location="Kernel/Modules/AgentQuickTicket.pm" />
+        <File Permission="644" Location="Kernel/Output/HTML/FilterElementPost/AgentQuickTicket.pm" />
+        <File Permission="644" Location="Kernel/Output/HTML/Templates/Standard/AdminAgentQuickTicket.tt" />
+        <File Permission="644" Location="Kernel/Output/HTML/Templates/Standard/AdminAgentQuickTicketEdit.tt" />
+        <File Permission="644" Location="Kernel/Output/HTML/Templates/Standard/AgentQuickTicketWidget.tt" />
+        <File Permission="644" Location="Kernel/System/AgentQuickTicket.pm" />
+        <File Permission="644" Location="var/httpd/htdocs/js/Core.Agent.Admin.AgentQuickTicket.js" />
+        <File Permission="644" Location="var/httpd/htdocs/js/Core.Agent.AgentQuickTicket.js" />
+        <File Permission="644" Location="var/httpd/htdocs/skins/Agent/default/css/AgentQuickTicket.css" />
+        <File Permission="755" Location="scripts/AgentQuickTicketMigrate.pl" />
+        <File Permission="644" Location="doc/ADMIN.md" />
+        <File Permission="644" Location="doc/CHANGELOG.md" />
+        <File Permission="644" Location="doc/INSTALL.md" />
+        <File Permission="644" Location="doc/README.md" />
+    </Filelist>
+
+    <DatabaseInstall Type="post">
+        <TableCreate Name="agent_quick_ticket_profile">
+            <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
+            <Column Name="internal_name" Required="true" Size="191" Type="VARCHAR" />
+            <Column Name="label" Required="true" Size="191" Type="VARCHAR" />
+            <Column Name="description" Required="false" Size="2000" Type="VARCHAR" />
+            <Column Name="icon" Required="true" Size="100" Type="VARCHAR" />
+            <Column Name="color" Required="true" Size="50" Type="VARCHAR" />
+            <Column Name="sort_order" Required="true" Type="INTEGER" />
+            <Column Name="configuration" Required="true" Type="LONGBLOB" />
+            <Column Name="valid_id" Required="true" Type="SMALLINT" />
+            <Column Name="create_time" Required="true" Type="DATE" />
+            <Column Name="create_by" Required="true" Type="INTEGER" />
+            <Column Name="change_time" Required="true" Type="DATE" />
+            <Column Name="change_by" Required="true" Type="INTEGER" />
+            <Unique Name="agent_quick_ticket_profile_internal_name">
+                <UniqueColumn Name="internal_name" />
+            </Unique>
+            <ForeignKey ForeignTable="valid">
+                <Reference Local="valid_id" Foreign="id" />
+            </ForeignKey>
+            <ForeignKey ForeignTable="users">
+                <Reference Local="create_by" Foreign="id" />
+                <Reference Local="change_by" Foreign="id" />
+            </ForeignKey>
+        </TableCreate>
+        <TableCreate Name="agent_quick_ticket_profile_group">
+            <Column Name="profile_id" Required="true" Type="INTEGER" />
+            <Column Name="group_id" Required="true" Type="INTEGER" />
+            <Unique Name="agent_quick_ticket_profile_group_unique">
+                <UniqueColumn Name="profile_id" />
+                <UniqueColumn Name="group_id" />
+            </Unique>
+            <Index Name="agent_quick_ticket_profile_group_profile_id">
+                <IndexColumn Name="profile_id" />
+            </Index>
+            <Index Name="agent_quick_ticket_profile_group_group_id">
+                <IndexColumn Name="group_id" />
+            </Index>
+            <ForeignKey ForeignTable="agent_quick_ticket_profile">
+                <Reference Local="profile_id" Foreign="id" />
+            </ForeignKey>
+            <ForeignKey ForeignTable="groups_table">
+                <Reference Local="group_id" Foreign="id" />
+            </ForeignKey>
+        </TableCreate>
+    </DatabaseInstall>
+
+    <DatabaseUninstall Type="pre">
+        <TableDrop Name="agent_quick_ticket_profile_group" />
+        <TableDrop Name="agent_quick_ticket_profile" />
+    </DatabaseUninstall>
+
+    <CodeInstall Type="post"><![CDATA[
+$Kernel::OM->Get('Kernel::System::AgentQuickTicket')->SeedDemoProfile( UserID => 1 );
+    ]]></CodeInstall>
+    <CodeUpgrade Type="post"><![CDATA[
+$Kernel::OM->Get('Kernel::System::AgentQuickTicket')->SeedDemoProfile( UserID => 1 );
+    ]]></CodeUpgrade>
+    <CodeReinstall Type="post"><![CDATA[
+$Kernel::OM->Get('Kernel::System::AgentQuickTicket')->SeedDemoProfile( UserID => 1 );
+    ]]></CodeReinstall>
+</otobo_package>

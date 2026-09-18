@@ -1,0 +1,98 @@
+[%# AgentQuickTicket admin overview %]
+<div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst AgentQuickTicketAdmin">
+    <h1 class="InvisibleText">[% Translate("Quick ticket profiles") | html %]</h1>
+
+    <div class="SidebarColumn">
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("Actions") | html %]</h2>
+            </div>
+            <div class="Content">
+                <ul class="ActionList">
+                    <li>
+                        <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Add" class="CallForAction Fullsize Center">
+                            <span><i class="fa fa-plus-square"></i> [% Translate("Add quick ticket profile") | html %]</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("About quick tickets") | html %]</h2>
+            </div>
+            <div class="Content">
+                <p>[% Translate("Profiles are applied to the regular AgentTicketPhone form. No ticket is created until the agent submits that form.") | html %]</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="ContentColumn">
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("Quick ticket profiles") | html %]</h2>
+            </div>
+            <div class="Content">
+                <table class="DataTable" id="AgentQuickTicketProfiles">
+                    <thead>
+                        <tr>
+                            <th>[% Translate("Label") | html %]</th>
+                            <th>[% Translate("Internal name") | html %]</th>
+                            <th>[% Translate("Defaults") | html %]</th>
+                            <th>[% Translate("Allowed agents") | html %]</th>
+                            <th>[% Translate("Validity") | html %]</th>
+                            <th>[% Translate("Validation") | html %]</th>
+                            <th>[% Translate("Actions") | html %]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+[% IF Data.Profiles.size %]
+[% FOREACH Profile IN Data.Profiles %]
+                        <tr [% IF !Profile.ValidID %]class="Invalid"[% END %]>
+                            <td>
+                                <a class="AsBlock" href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Change;ID=[% Profile.ID | uri %]">
+                                    <i class="fa [% Profile.Icon | html %]"></i> [% Profile.Label | html %]
+                                </a>
+                            </td>
+                            <td><code>[% Profile.InternalName | html %]</code></td>
+                            <td>
+                                [% IF Profile.QueueID %]Queue [% Profile.QueueID | html %][% END %]
+                                [% IF Profile.TypeID %], Type [% Profile.TypeID | html %][% END %]
+                                [% IF Profile.ServiceID %], Service [% Profile.ServiceID | html %][% END %]
+                                [% IF Profile.PriorityID %], Priority [% Profile.PriorityID | html %][% END %]
+                            </td>
+                            <td>
+                                [% IF Profile.GroupCount %]
+                                    [% Profile.GroupCount | html %] [% Translate("group(s)") | html %]
+                                [% ELSE %]
+                                    [% Translate("All eligible agents") | html %]
+                                [% END %]
+                            </td>
+                            <td>[% Profile.ValidName | html %]</td>
+                            <td>
+                                [% IF Profile.IsValid %]
+                                    <span class="Success">[% Translate("OK") | html %]</span>
+                                [% ELSE %]
+                                    <span class="Error">[% Profile.ValidationText | html %]</span>
+                                [% END %]
+                            </td>
+                            <td class="AgentQuickTicketActions">
+                                <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Change;ID=[% Profile.ID | uri %]" title="[% Translate("Edit") | html %]"><i class="fa fa-pencil"></i></a>
+                                <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Copy;ID=[% Profile.ID | uri %];[% Env("ChallengeTokenParam") | html %]" title="[% Translate("Copy") | html %]"><i class="fa fa-copy"></i></a>
+                                <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Toggle;ID=[% Profile.ID | uri %];[% Env("ChallengeTokenParam") | html %]" title="[% Translate("Toggle validity") | html %]"><i class="fa fa-toggle-on"></i></a>
+                                <a class="TrashCan" href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Delete;ID=[% Profile.ID | uri %];[% Env("ChallengeTokenParam") | html %]" title="[% Translate("Delete") | html %]" data-confirm="[% Translate("Delete this quick ticket profile?") | html %]"><i class="fa fa-trash"></i></a>
+                            </td>
+                        </tr>
+[% END %]
+[% ELSE %]
+                        <tr>
+                            <td colspan="7">[% Translate("No quick ticket profiles are configured.") | html %]</td>
+                        </tr>
+[% END %]
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

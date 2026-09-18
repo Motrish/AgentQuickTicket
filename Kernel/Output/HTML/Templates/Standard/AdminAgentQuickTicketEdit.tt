@@ -1,0 +1,379 @@
+[%# AgentQuickTicket admin edit form %]
+<div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst AgentQuickTicketAdmin">
+    <h1 class="InvisibleText">[% Translate("Edit quick ticket profile") | html %]</h1>
+
+    <div class="SidebarColumn">
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("Actions") | html %]</h2>
+            </div>
+            <div class="Content">
+                <ul class="ActionList">
+                    <li>
+                        <a href="[% Env("Baselink") %]Action=[% Env("Action") %]" class="CallForAction Fullsize Center">
+                            <span><i class="fa fa-caret-left"></i> [% Translate("Go to overview") | html %]</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("Placeholder syntax") | html %]</h2>
+            </div>
+            <div class="Content">
+                <p><code>%CustomerUserID%</code>, <code>%CustomerFullname%</code>, <code>%CustomerEmail%</code>, <code>%AgentLogin%</code>, <code>%CurrentDate%</code> [% Translate("and the other documented placeholders can be used in text values.") | html %]</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="ContentColumn">
+        <div class="WidgetSimple">
+            <div class="Header">
+[% IF Data.Action == 'Add' %]
+                <h2>[% Translate("Add quick ticket profile") | html %]</h2>
+[% ELSE %]
+                <h2>[% Translate("Edit quick ticket profile") | html %]</h2>
+[% END %]
+            </div>
+            <div class="Content">
+[% IF Data.Errors.General %]
+                <div class="MessageBox Error"><p>[% Data.Errors.General | html %]</p></div>
+[% END %]
+[% IF Data.Errors.Configuration %]
+                <div class="MessageBox Error">
+                    <p>[% Translate("The configuration contains errors:") | html %]</p>
+                    <ul>
+[% FOREACH Error IN Data.Errors.Configuration %]
+                        <li>[% Error | html %]</li>
+[% END %]
+                    </ul>
+                </div>
+[% END %]
+[% FOREACH ErrorName IN [ 'InternalName', 'Label', 'Icon', 'Color', 'Groups', 'DynamicFields' ] %]
+[% IF Data.Errors.$ErrorName %]
+                <div class="MessageBox Error"><p>[% Data.Errors.$ErrorName | html %]</p></div>
+[% END %]
+[% END %]
+
+                <form id="AgentQuickTicketEdit" action="[% Env("CGIHandle") %]" method="post" class="Validate PreventMultipleSubmits">
+                    <input type="hidden" name="Action" value="[% Env("Action") %]"/>
+                    <input type="hidden" name="Subaction" value="[% Data.Action | html %]Action"/>
+                    <input type="hidden" name="ID" value="[% Data.ID | html %]"/>
+                    <input type="hidden" name="DynamicFieldsJSON" id="DynamicFieldsJSON" value="[% Data.DynamicFieldsJSON | html %]"/>
+                    <fieldset class="TableLike">
+                        <legend>[% Translate("Basic data") | html %]</legend>
+
+                        <label class="Mandatory" for="InternalName"><span class="Marker">*</span> [% Translate("Internal name") | html %]:</label>
+                        <div class="Field">
+                            <input type="text" name="InternalName" id="InternalName" value="[% Data.InternalName | html %]" class="W50pc" maxlength="191" required="required"/>
+                            <p class="FieldHelp">[% Translate("Stable identifier used for administration and migrations.") | html %]</p>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label class="Mandatory" for="Label"><span class="Marker">*</span> [% Translate("Label") | html %]:</label>
+                        <div class="Field">
+                            <input type="text" name="Label" id="Label" value="[% Data.Label | html %]" class="W50pc" maxlength="191" required="required"/>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label for="Description">[% Translate("Description") | html %]:</label>
+                        <div class="Field">
+                            <textarea name="Description" id="Description" class="W50pc" rows="3">[% Data.Description | html %]</textarea>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label for="Icon">[% Translate("Icon") | html %]:</label>
+                        <div class="Field">
+                            <input type="text" name="Icon" id="Icon" value="[% Data.Icon | html %]" class="W25pc" maxlength="100"/>
+                            <p class="FieldHelp">[% Translate("Font Awesome class, for example fa-key.") | html %]</p>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label for="Color">[% Translate("Button color") | html %]:</label>
+                        <div class="Field">
+                            <input type="text" name="Color" id="Color" value="[% Data.Color | html %]" class="W25pc" maxlength="50"/>
+                            <p class="FieldHelp">[% Translate("Use Primary, Success, Warning, Danger, Info, Neutral or a six-digit hex color.") | html %]</p>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label for="SortOrder">[% Translate("Sort order") | html %]:</label>
+                        <div class="Field">
+                            <input type="number" name="SortOrder" id="SortOrder" value="[% Data.SortOrder | html %]" min="0" max="9999" class="W10pc"/>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label for="ValidID">[% Translate("Validity") | html %]:</label>
+                        <div class="Field">
+                            <select name="ValidID" id="ValidID">
+                                <option value="1" [% IF Data.ValidID == 1 %]selected="selected"[% END %]>[% Translate("valid") | html %]</option>
+                                <option value="2" [% IF Data.ValidID == 2 %]selected="selected"[% END %]>[% Translate("invalid") | html %]</option>
+                            </select>
+                        </div>
+                        <div class="Clear"></div>
+                    </fieldset>
+
+                    <fieldset class="TableLike">
+                        <legend>[% Translate("Agent access") | html %]</legend>
+                        <label for="AllowedGroupIDs">[% Translate("Allowed groups") | html %]:</label>
+                        <div class="Field">
+                            <select name="AllowedGroupIDs" id="AllowedGroupIDs" multiple="multiple" size="8" class="W50pc">
+[% FOREACH Group IN Data.Groups %]
+                                <option value="[% Group.ID | html %]" [% IF Group.Selected %]selected="selected"[% END %]>[% Group.Name | html %]</option>
+[% END %]
+                            </select>
+                            <p class="FieldHelp">[% Translate("Leave empty only when all eligible agents are explicitly allowed below.") | html %]</p>
+                            <label for="AllowAllEligibleAgents" class="CheckboxLabel">
+                                <input type="checkbox" name="AllowAllEligibleAgents" id="AllowAllEligibleAgents" value="1" [% Data.AllowAllEligibleAgentsChecked | html %]/>
+                                [% Translate("Allow all eligible agents when no group is selected") | html %]
+                            </label>
+                        </div>
+                        <div class="Clear"></div>
+                    </fieldset>
+
+                    <fieldset class="TableLike">
+                        <legend>[% Translate("Ticket fields") | html %]</legend>
+                        <p class="FieldHelp AgentQuickTicketFieldHelp">[% Translate("Keep preserves the current form value, Set writes the configured value, and Clear removes it. IDs are validated server-side.") | html %]</p>
+                        <table class="DataTable AgentQuickTicketFieldTable">
+                            <thead>
+                                <tr>
+                                    <th>[% Translate("Field") | html %]</th>
+                                    <th>[% Translate("Mode") | html %]</th>
+                                    <th>[% Translate("Value") | html %]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+[% FOREACH Row IN Data.FieldRows %]
+                                <tr>
+                                    <td><label for="FieldMode_[% Row.Name | html %]"><strong>[% Translate(Row.Label) | html %]</strong></label></td>
+                                    <td>
+                                        <select name="FieldMode_[% Row.Name | html %]" id="FieldMode_[% Row.Name | html %]" class="AgentQuickTicketFieldMode">
+                                            <option value="Keep" [% IF Row.Mode == 'Keep' %]selected="selected"[% END %]>[% Translate("Keep") | html %]</option>
+                                            <option value="Set" [% IF Row.Mode == 'Set' %]selected="selected"[% END %]>[% Translate("Set") | html %]</option>
+                                            <option value="Clear" [% IF Row.Mode == 'Clear' %]selected="selected"[% END %]>[% Translate("Clear") | html %]</option>
+                                        </select>
+                                    </td>
+                                    <td>
+[% IF Row.Name == 'QueueID' %]
+                                        <select name="FieldValue_[% Row.Name | html %]" id="FieldValue_[% Row.Name | html %]" class="W90pc">
+                                            <option value="">--</option>
+[% FOREACH Option IN Data.Queues %]
+                                            <option value="[% Option.ID | html %]" [% IF Option.Selected %]selected="selected"[% END %]>[% Option.Name | html %]</option>
+[% END %]
+                                        </select>
+[% ELSIF Row.Name == 'TypeID' %]
+                                        <select name="FieldValue_[% Row.Name | html %]" id="FieldValue_[% Row.Name | html %]" class="W90pc">
+                                            <option value="">--</option>
+[% FOREACH Option IN Data.Types %]
+                                            <option value="[% Option.ID | html %]" [% IF Option.Selected %]selected="selected"[% END %]>[% Option.Name | html %]</option>
+[% END %]
+                                        </select>
+[% ELSIF Row.Name == 'ServiceID' %]
+                                        <select name="FieldValue_[% Row.Name | html %]" id="FieldValue_[% Row.Name | html %]" class="W90pc">
+                                            <option value="">--</option>
+[% FOREACH Option IN Data.Services %]
+                                            <option value="[% Option.ID | html %]" [% IF Option.Selected %]selected="selected"[% END %]>[% Option.Name | html %]</option>
+[% END %]
+                                        </select>
+[% ELSIF Row.Name == 'SLAID' %]
+                                        <select name="FieldValue_[% Row.Name | html %]" id="FieldValue_[% Row.Name | html %]" class="W90pc">
+                                            <option value="">--</option>
+[% FOREACH Option IN Data.SLAs %]
+                                            <option value="[% Option.ID | html %]" [% IF Option.Selected %]selected="selected"[% END %]>[% Option.Name | html %]</option>
+[% END %]
+                                        </select>
+[% ELSIF Row.Name == 'PriorityID' %]
+                                        <select name="FieldValue_[% Row.Name | html %]" id="FieldValue_[% Row.Name | html %]" class="W90pc">
+                                            <option value="">--</option>
+[% FOREACH Option IN Data.Priorities %]
+                                            <option value="[% Option.ID | html %]" [% IF Option.Selected %]selected="selected"[% END %]>[% Option.Name | html %]</option>
+[% END %]
+                                        </select>
+[% ELSIF Row.Name == 'NextStateID' %]
+                                        <select name="FieldValue_[% Row.Name | html %]" id="FieldValue_[% Row.Name | html %]" class="W90pc">
+                                            <option value="">--</option>
+[% FOREACH Option IN Data.States %]
+                                            <option value="[% Option.ID | html %]" [% IF Option.Selected %]selected="selected"[% END %]>[% Option.Name | html %]</option>
+[% END %]
+                                        </select>
+[% ELSIF Row.Name == 'NewUserID' %]
+                                        <select name="FieldValue_[% Row.Name | html %]" id="FieldValue_[% Row.Name | html %]" class="W90pc">
+                                            <option value="">--</option>
+[% FOREACH Option IN Data.Users %]
+                                            <option value="[% Option.ID | html %]" [% IF Option.ID == Row.Value %]selected="selected"[% END %]>[% Option.Name | html %]</option>
+[% END %]
+                                        </select>
+[% ELSIF Row.Name == 'NewResponsibleID' %]
+                                        <select name="FieldValue_[% Row.Name | html %]" id="FieldValue_[% Row.Name | html %]" class="W90pc">
+                                            <option value="">--</option>
+[% FOREACH Option IN Data.Users %]
+                                            <option value="[% Option.ID | html %]" [% IF Option.ID == Row.Value %]selected="selected"[% END %]>[% Option.Name | html %]</option>
+[% END %]
+                                        </select>
+[% ELSIF Row.Name == 'Body' %]
+                                        <textarea name="FieldValue_[% Row.Name | html %]" id="FieldValue_[% Row.Name | html %]" class="W90pc" rows="4">[% Row.Value | html %]</textarea>
+[% ELSE %]
+                                        <input type="text" name="FieldValue_[% Row.Name | html %]" id="FieldValue_[% Row.Name | html %]" value="[% Row.Value | html %]" class="W90pc"/>
+[% END %]
+                                    </td>
+                                </tr>
+[% END %]
+                            </tbody>
+                        </table>
+                    </fieldset>
+
+                    <fieldset class="TableLike">
+                        <legend>[% Translate("Dynamic fields") | html %]</legend>
+                        <p class="FieldHelp">[% Translate("Only valid Ticket or Article dynamic fields with supported types are accepted. Values can contain placeholders.") | html %]</p>
+                        <div class="AgentQuickTicketDynamicFieldToolbar">
+                            <button type="button" class="Primary" id="AgentQuickTicketAddDynamicField"><i class="fa fa-plus"></i> [% Translate("Add dynamic field") | html %]</button>
+                        </div>
+                        <table class="DataTable" id="AgentQuickTicketDynamicFields">
+                            <thead>
+                                <tr>
+                                    <th>[% Translate("Dynamic field") | html %]</th>
+                                    <th>[% Translate("Object") | html %]</th>
+                                    <th>[% Translate("Type") | html %]</th>
+                                    <th>[% Translate("Mode") | html %]</th>
+                                    <th>[% Translate("Value") | html %]</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody data-role="dynamic-rows">
+[% FOREACH Row IN Data.DynamicFieldRows %]
+                                <tr class="AgentQuickTicketDynamicFieldRow">
+                                    <td>
+                                        <select class="AgentQuickTicketDynamicFieldName W90pc">
+                                            <option value="">--</option>
+[% FOREACH Definition IN Data.DynamicFieldDefinitions %]
+                                            <option value="[% Definition.Name | html %]" data-field-type="[% Definition.FieldType | html %]" data-object-type="[% Definition.ObjectType | html %]" data-possible-values="[% Definition.PossibleValuesJSON | html %]" [% IF !Definition.Supported %]disabled="disabled"[% ELSIF !Definition.Enabled %]disabled="disabled"[% END %] [% IF Definition.Name == Row.Name %]selected="selected"[% END %]>[% Definition.Label | html %] ([% Definition.Name | html %])</option>
+[% END %]
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="AgentQuickTicketDynamicFieldObject">
+                                            <option value="Ticket" [% IF Row.ObjectType == 'Ticket' %]selected="selected"[% END %]>Ticket</option>
+                                            <option value="Article" [% IF Row.ObjectType == 'Article' %]selected="selected"[% END %]>Article</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <span class="AgentQuickTicketDynamicFieldType">[% Row.FieldType | html %]</span>
+                                    </td>
+                                    <td>
+                                        <select class="AgentQuickTicketDynamicFieldMode">
+                                            <option value="Keep" [% IF Row.Mode == 'Keep' %]selected="selected"[% END %]>[% Translate("Keep") | html %]</option>
+                                            <option value="Set" [% IF Row.Mode == 'Set' %]selected="selected"[% END %]>[% Translate("Set") | html %]</option>
+                                            <option value="Clear" [% IF Row.Mode == 'Clear' %]selected="selected"[% END %]>[% Translate("Clear") | html %]</option>
+                                        </select>
+                                    </td>
+                                    <td><input type="text" class="AgentQuickTicketDynamicFieldValue W90pc" value="[% Row.Value | html %]"/></td>
+                                    <td><button type="button" class="AgentQuickTicketRemoveDynamicField" title="[% Translate("Remove") | html %]"><i class="fa fa-trash"></i></button></td>
+                                </tr>
+[% END %]
+                                <tr id="AgentQuickTicketDynamicFieldRowTemplate" class="Hidden">
+                                    <td>
+                                        <select class="AgentQuickTicketDynamicFieldName W90pc">
+                                            <option value="">--</option>
+[% FOREACH Definition IN Data.DynamicFieldDefinitions %]
+                                            <option value="[% Definition.Name | html %]" data-field-type="[% Definition.FieldType | html %]" data-object-type="[% Definition.ObjectType | html %]" data-possible-values="[% Definition.PossibleValuesJSON | html %]" [% IF !Definition.Supported %]disabled="disabled"[% ELSIF !Definition.Enabled %]disabled="disabled"[% END %]>[% Definition.Label | html %] ([% Definition.Name | html %])</option>
+[% END %]
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="AgentQuickTicketDynamicFieldObject"><option value="Ticket">Ticket</option><option value="Article">Article</option></select>
+                                    </td>
+                                    <td><span class="AgentQuickTicketDynamicFieldType"></span></td>
+                                    <td>
+                                        <select class="AgentQuickTicketDynamicFieldMode"><option value="Keep">[% Translate("Keep") | html %]</option><option value="Set">[% Translate("Set") | html %]</option><option value="Clear">[% Translate("Clear") | html %]</option></select>
+                                    </td>
+                                    <td><input type="text" class="AgentQuickTicketDynamicFieldValue W90pc" value=""/></td>
+                                    <td><button type="button" class="AgentQuickTicketRemoveDynamicField" title="[% Translate("Remove") | html %]"><i class="fa fa-trash"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </fieldset>
+
+                    <fieldset class="TableLike">
+                        <legend>[% Translate("Customer scope") | html %]</legend>
+                        <label for="CustomerScopeMode">[% Translate("Scope") | html %]:</label>
+                        <div class="Field">
+                            <select name="CustomerScopeMode" id="CustomerScopeMode">
+                                <option value="All" [% IF Data.Configuration.CustomerScope.Mode == 'All' %]selected="selected"[% END %]>[% Translate("All customer users") | html %]</option>
+                                <option value="CustomerIDs" [% IF Data.Configuration.CustomerScope.Mode == 'CustomerIDs' %]selected="selected"[% END %]>[% Translate("Only listed customer logins or customer IDs") | html %]</option>
+                            </select>
+                        </div>
+                        <div class="Clear"></div>
+                        <label for="CustomerIDs">[% Translate("Customer logins / IDs") | html %]:</label>
+                        <div class="Field">
+                            <textarea name="CustomerIDs" id="CustomerIDs" class="W50pc" rows="4">[% Data.CustomerIDsText | html %]</textarea>
+                        </div>
+                        <div class="Clear"></div>
+                    </fieldset>
+
+                    <fieldset class="TableLike">
+                        <legend>[% Translate("Apply behavior") | html %]</legend>
+                        <label for="InvalidValueBehavior">[% Translate("Invalid values") | html %]:</label>
+                        <div class="Field">
+                            <select name="InvalidValueBehavior" id="InvalidValueBehavior">
+                                <option value="Abort" [% IF Data.Configuration.InvalidValueBehavior == 'Abort' %]selected="selected"[% END %]>[% Translate("Abort application") | html %]</option>
+                                <option value="Warn" [% IF Data.Configuration.InvalidValueBehavior == 'Warn' %]selected="selected"[% END %]>[% Translate("Apply with warning") | html %]</option>
+                            </select>
+                        </div>
+                        <div class="Clear"></div>
+                        <label for="ConfirmBeforeApply">[% Translate("Confirmation") | html %]:</label>
+                        <div class="Field">
+                            <label for="ConfirmBeforeApply" class="CheckboxLabel"><input type="checkbox" name="ConfirmBeforeApply" id="ConfirmBeforeApply" value="1" [% Data.ConfirmBeforeApplyChecked | html %]/> [% Translate("Ask for confirmation before applying") | html %]</label>
+                            <label for="WarnOnExistingChanges" class="CheckboxLabel"><input type="checkbox" name="WarnOnExistingChanges" id="WarnOnExistingChanges" value="1" [% Data.WarnOnExistingChangesChecked | html %]/> [% Translate("Warn when existing values would be overwritten") | html %]</label>
+                        </div>
+                        <div class="Clear"></div>
+                    </fieldset>
+
+                    <div class="Actions">
+                        <button type="submit" class="Primary"><i class="fa fa-save"></i> [% Translate("Save") | html %]</button>
+                        <a href="[% Env("Baselink") %]Action=[% Env("Action") %]" class="Cancel"><span>[% Translate("Cancel") | html %]</span></a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="WidgetSimple">
+            <div class="Header"><h2>[% Translate("Test profile") | html %]</h2></div>
+            <div class="Content">
+                <form action="[% Env("CGIHandle") %]" method="post" class="TableLike">
+                    <input type="hidden" name="Action" value="[% Env("Action") %]"/>
+                    <input type="hidden" name="Subaction" value="Test"/>
+                    <input type="hidden" name="ID" value="[% Data.ID | html %]"/>
+                    <label for="TestCustomerUserID">[% Translate("Customer user login") | html %]:</label>
+                    <div class="Field">
+                        <input type="text" name="TestCustomerUserID" id="TestCustomerUserID" value="[% Data.TestCustomerUserID | html %]" class="W50pc"/>
+                        <button type="submit" class="Secondary"><i class="fa fa-flask"></i> [% Translate("Resolve profile") | html %]</button>
+                    </div>
+                    <div class="Clear"></div>
+                </form>
+[% IF Data.TestResult %]
+                <div class="AgentQuickTicketTestResult [% IF Data.TestResult.Success %]Success[% ELSE %]Error[% END %]">
+                    <p><strong>[% IF Data.TestResult.Success %][% Translate("Profile can be applied.") | html %][% ELSE %][% Data.TestResult.Error | html %][% END %]</strong></p>
+[% IF Data.TestResult.ChangedFields.size %]
+                    <p>[% Translate("Changed fields:") | html %] [% Data.TestResult.ChangedFields.join(', ') | html %]</p>
+[% END %]
+[% IF Data.TestResult.Warnings.size %]
+                    <ul>
+[% FOREACH Warning IN Data.TestResult.Warnings %]
+                        <li>[% Warning | html %]</li>
+[% END %]
+                    </ul>
+[% END %]
+[% IF Data.TestResult.Errors.size %]
+                    <ul>
+[% FOREACH Error IN Data.TestResult.Errors %]
+                        <li>[% Error | html %]</li>
+[% END %]
+                    </ul>
+[% END %]
+                </div>
+[% END %]
+            </div>
+        </div>
+    </div>
+</div>

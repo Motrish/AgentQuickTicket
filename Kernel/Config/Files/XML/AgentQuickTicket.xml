@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otobo_config version="2.0" init="Application">
+    <Setting Name="Frontend::Module###AdminAgentQuickTicket" Required="0" Valid="1">
+        <Description Translatable="1">Frontend module registration for AgentQuickTicket administration.</Description>
+        <Navigation>Frontend::Admin::ModuleRegistration</Navigation>
+        <Value>
+            <Item ValueType="FrontendRegistration">
+                <Hash>
+                    <Item Key="GroupRo"><Array></Array></Item>
+                    <Item Key="Group">
+                        <Array><Item>admin</Item></Array>
+                    </Item>
+                    <Item Key="Description" Translatable="1">Configure quick ticket profiles.</Item>
+                    <Item Key="Title" Translatable="1">Quick ticket profiles</Item>
+                    <Item Key="NavBarName">Admin</Item>
+                </Hash>
+            </Item>
+        </Value>
+    </Setting>
+
+    <Setting Name="Loader::Module::AdminAgentQuickTicket###001-AgentQuickTicket" Required="0" Valid="1">
+        <Description Translatable="1">Loader registration for AgentQuickTicket administration.</Description>
+        <Navigation>Frontend::Admin::ModuleRegistration::Loader</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="CSS">
+                    <Array><Item>AgentQuickTicket.css</Item></Array>
+                </Item>
+                <Item Key="JavaScript">
+                    <Array><Item>Core.Agent.Admin.AgentQuickTicket.js</Item></Array>
+                </Item>
+            </Hash>
+        </Value>
+    </Setting>
+
+    <Setting Name="Frontend::NavigationModule###AdminAgentQuickTicket" Required="0" Valid="1">
+        <Description Translatable="1">Admin area navigation for AgentQuickTicket.</Description>
+        <Navigation>Frontend::Admin::ModuleRegistration::AdminOverview</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="Group"><Array><Item>admin</Item></Array></Item>
+                <Item Key="GroupRo"><Array></Array></Item>
+                <Item Key="Module">Kernel::Output::HTML::NavBar::ModuleAdmin</Item>
+                <Item Key="Name" Translatable="1">Quick ticket profiles</Item>
+                <Item Key="Block">Ticket</Item>
+                <Item Key="Description" Translatable="1">Create and manage quick ticket profiles.</Item>
+                <Item Key="IconBig">fa-bolt</Item>
+                <Item Key="IconSmall"></Item>
+            </Hash>
+        </Value>
+    </Setting>
+
+    <Setting Name="Frontend::Module###AgentQuickTicket" Required="0" Valid="1">
+        <Description Translatable="1">AJAX frontend module for AgentQuickTicket.</Description>
+        <Navigation>Frontend::Agent::ModuleRegistration</Navigation>
+        <Value>
+            <Item ValueType="FrontendRegistration">
+                <Hash>
+                    <Item Key="Group"><Array></Array></Item>
+                    <Item Key="GroupRo"><Array></Array></Item>
+                    <Item Key="Description" Translatable="1">AJAX endpoint for quick ticket profiles.</Item>
+                    <Item Key="Title" Translatable="1">Quick ticket endpoint</Item>
+                    <Item Key="NavBarName"></Item>
+                </Hash>
+            </Item>
+        </Value>
+    </Setting>
+
+    <Setting Name="Loader::Module::AgentTicketPhone###003-AgentQuickTicket" Required="0" Valid="1">
+        <Description Translatable="1">Loader registration for the AgentTicketPhone quick ticket widget.</Description>
+        <Navigation>Frontend::Agent::ModuleRegistration::Loader</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="CSS">
+                    <Array><Item>AgentQuickTicket.css</Item></Array>
+                </Item>
+                <Item Key="JavaScript">
+                    <Array><Item>Core.Agent.AgentQuickTicket.js</Item></Array>
+                </Item>
+            </Hash>
+        </Value>
+    </Setting>
+
+    <Setting Name="Frontend::Output::FilterElementPost###AgentQuickTicket" Required="0" Valid="1">
+        <Description Translatable="1">Injects the AgentQuickTicket widget into AgentTicketPhone.</Description>
+        <Navigation>Frontend::Base::OutputFilter</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="Module">Kernel::Output::HTML::FilterElementPost::AgentQuickTicket</Item>
+                <Item Key="Templates">
+                    <Hash><Item Key="AgentTicketPhone">1</Item></Hash>
+                </Item>
+            </Hash>
+        </Value>
+    </Setting>
+</otobo_config>
