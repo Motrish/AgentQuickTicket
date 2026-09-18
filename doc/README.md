@@ -58,7 +58,7 @@ Je nach OTOBO-Navigation ist sie unter `Ticket` → `Quick ticket profiles` erre
 ## Installation über die Kommandozeile
 
 ```bash
-bin/otobo.Console.pl Admin::Package::Install /path/to/AgentQuickTicket-1.0.8.opm
+bin/otobo.Console.pl Admin::Package::Install /path/to/AgentQuickTicket-1.0.9.opm
 bin/otobo.Console.pl Maint::Config::Rebuild
 bin/otobo.Console.pl Maint::Cache::Delete
 ```
@@ -147,6 +147,8 @@ Unterstützte Standardfelder:
 - Zeiteinheiten
 
 Bei `Queue` wird das interne OTOBO-Format `QueueID||QueueName` automatisch gesetzt. Das Profil arbeitet auf dem bestehenden Ticketformular. Bereits vorhandene Anhänge und andere Formularwerte bleiben erhalten.
+
+Nach dem Anwenden werden die sichtbaren OTOBO-Modernize-Auswahlfelder neu gezeichnet. Dadurch zeigen beispielsweise Queue, Service, Priorität und nächster Status unmittelbar den übernommenen Wert und nicht nur den intern gesetzten Formularwert.
 
 ## Artikeltext und CKEditor
 
@@ -381,4 +383,3 @@ node --check var/httpd/htdocs/js/Core.Agent.Admin.AgentQuickTicket.js
 - Changelog: [`CHANGELOG.md`](CHANGELOG.md)
 - Administrationsdetails: [`ADMIN.md`](ADMIN.md)
 - Installationsdetails: [`INSTALL.md`](INSTALL.md)
-

@@ -11,12 +11,12 @@ bin/otobo.Console.pl Dev::Package::Build \
   /tmp
 ```
 
-The result is `/tmp/AgentQuickTicket-1.0.8.opm`.
+The result is `/tmp/AgentQuickTicket-1.0.9.opm`.
 
 ## Install
 
 ```bash
-bin/otobo.Console.pl Admin::Package::Install /tmp/AgentQuickTicket-1.0.8.opm
+bin/otobo.Console.pl Admin::Package::Install /tmp/AgentQuickTicket-1.0.9.opm
 bin/otobo.Console.pl Maint::Config::Rebuild
 bin/otobo.Console.pl Maint::Cache::Delete
 ```

@@ -287,6 +287,21 @@ Core.Agent.AgentQuickTicket = (function (TargetNS) {
         return true;
     }
 
+    function RefreshVisibleFormValue(Name) {
+        var $Elements = FormElements(Name);
+        if (!$Elements.length) {
+            return;
+        }
+
+        // OTOBO's Modernize widgets keep a separate visible search/selection
+        // element next to the original select. Updating only the select value
+        // changes the POST value but leaves that visible element unchanged.
+        // These are the same events OTOBO uses after AJAX option updates.
+        $Elements.each(function () {
+            $(this).trigger('redraw.InputField').trigger('change');
+        });
+    }
+
     function ValueIsDifferent(Current, NewValue) {
         if ($.isArray(Current) || $.isArray(NewValue)) {
             var CurrentArray = $.isArray(Current) ? Current : [Current];
@@ -391,6 +406,11 @@ Core.Agent.AgentQuickTicket = (function (TargetNS) {
         // the just-applied article text. The normal Create action submits the
         // synchronized textarea afterwards.
         if (HasBodyPrefill) {
+            Object.keys(Prefill).forEach(function (Name) {
+                if (Name !== 'Body') {
+                    RefreshVisibleFormValue(Name);
+                }
+            });
             return;
         }
 

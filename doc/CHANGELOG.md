@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.9
+
+- Redraw visible OTOBO Modernize fields after applying a profile so selections such as next ticket state are immediately visible.
+
 ## 1.0.8
 
 - Rewrite the user documentation with installation, configuration, placeholders, troubleshooting, security and operational guidance.

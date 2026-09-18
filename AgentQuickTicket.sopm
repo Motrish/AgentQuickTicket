@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <otobo_package version="1.1">
     <Name>AgentQuickTicket</Name>
-    <Version>1.0.8</Version>
+    <Version>1.0.9</Version>
     <Vendor>Michael Nehmer | Motrish</Vendor>
     <URL>https://github.com/Motrish/AgentQuickTicket</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
@@ -13,6 +13,7 @@
     <PackageAllowDirectUpdate>1</PackageAllowDirectUpdate>
     <Description Lang="en">Configurable agent quick ticket profiles for AgentTicketPhone.</Description>
     <Description Lang="de">Konfigurierbare Schnellticket-Profile für AgentTicketPhone.</Description>
+    <ChangeLog Date="2026-09-18" Version="1.0.9">Redraw visible OTOBO Modernize fields after applying a profile so selections such as next ticket state are immediately visible.</ChangeLog>
     <ChangeLog Date="2026-09-18" Version="1.0.8">Rewrite the user documentation with installation, configuration, placeholders, troubleshooting, security and operational guidance.</ChangeLog>
     <ChangeLog Date="2026-09-18" Version="1.0.7">Merge the German AgentQuickTicket translations into the existing OTOBO catalog instead of replacing all core translations.</ChangeLog>
     <ChangeLog Date="2026-09-18" Version="1.0.6">Keep the German language extension plugin-specific and translate AgentQuickTicket validation and AJAX messages without overriding OTOBO core translations.</ChangeLog>

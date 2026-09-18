@@ -96,6 +96,8 @@ like( $AgentJS, qr/hasOwnProperty\.call\(Prefill, 'Body'\)/, 'article-text profi
 like( $AgentJS, qr/name="ExpandCustomerName"/, 'prefill refresh targets the AgentTicketPhone no-submit field' );
 like( $AgentJS, qr/\$ExpandCustomerName\.val\('4'\)/, 'prefill refresh uses the no-submit AgentTicketPhone path' );
 like( $AgentJS, qr/HTMLFormElement\.prototype\.submit\.call/, 'prefill refresh uses native form submission' );
+like( $AgentJS, qr/trigger\('redraw\.InputField'\)/, 'visible Modernize fields are redrawn after profile application' );
+like( $AgentJS, qr/trigger\('change'\)/, 'OTOBO change handlers are notified after profile application' );
 
 open my $ControllerHandle, '<', File::Spec->catfile( $Root, 'Kernel', 'Modules', 'AgentQuickTicket.pm' )
     or die "Cannot read controller: $!";
