@@ -105,7 +105,14 @@ sub Run {
                 );
             }
 
-            return $LayoutObject->Redirect( OP => "Action=$Self->{Action}" ) if $Success;
+            if ($Success) {
+                return $LayoutObject->Redirect( OP => "Action=$Self->{Action}" );
+            }
+
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "AgentQuickTicket profile save failed: action=$Action internal_name=$Data->{InternalName}",
+            );
             $Errors->{General} = $LanguageObject->Translate('The profile could not be saved.');
         }
 
@@ -168,6 +175,20 @@ sub Run {
         return $LayoutObject->Redirect( OP => "Action=$Self->{Action}" );
     }
 
+    if ( $Subaction eq 'ToggleSeparator' ) {
+        $LayoutObject->ChallengeTokenCheck();
+        my $ID = $ParamObject->GetParam( Param => 'ID' ) || '';
+        my $Profile = $QuickTicketObject->ProfileGet( ID => $ID );
+        if ($Profile) {
+            $QuickTicketObject->SetSeparatorBefore(
+                ID      => $ID,
+                Enabled => !$Profile->{Configuration}{Presentation}{SeparatorBefore},
+                UserID  => $Self->{UserID},
+            );
+        }
+        return $LayoutObject->Redirect( OP => "Action=$Self->{Action}" );
+    }
+
     if ( $Subaction eq 'Test' ) {
         my $ID = $ParamObject->GetParam( Param => 'ID' ) || '';
         my $Profile = $QuickTicketObject->ProfileGet( ID => $ID );
@@ -220,6 +241,7 @@ sub _RenderOverview {
             TypeID         => $TypeID,
             PriorityID     => $PriorityID,
             GroupCount     => scalar @{ $Profile->{AllowedGroupIDs} || [] },
+            SeparatorBefore => $Profile->{Configuration}{Presentation}{SeparatorBefore} ? 1 : 0,
         };
     }
 
@@ -271,6 +293,7 @@ sub _RenderEdit {
         ConfirmBeforeApplyChecked => $Configuration->{ConfirmBeforeApply} ? 'checked' : '',
         WarnOnExistingChangesChecked => $Configuration->{WarnOnExistingChanges} ? 'checked' : '',
         AllowAllEligibleAgentsChecked => $Configuration->{AllowAllEligibleAgents} ? 'checked' : '',
+        SeparatorBeforeChecked => $Configuration->{Presentation}{SeparatorBefore} ? 'checked' : '',
     );
 
     my $Output = join '', $LayoutObject->Header(), $LayoutObject->NavigationBar();
@@ -327,6 +350,7 @@ sub _ReadForm {
     $Configuration->{WarnOnExistingChanges} = $ParamObject->GetParam( Param => 'WarnOnExistingChanges' ) ? 1 : 0;
     $Configuration->{InvalidValueBehavior} = $ParamObject->GetParam( Param => 'InvalidValueBehavior' ) || 'Abort';
     $Configuration->{AllowAllEligibleAgents} = $ParamObject->GetParam( Param => 'AllowAllEligibleAgents' ) ? 1 : 0;
+    $Configuration->{Presentation}{SeparatorBefore} = $ParamObject->GetParam( Param => 'SeparatorBefore' ) ? 1 : 0;
     $Data{Configuration} = $Configuration;
 
     my @GroupIDs = $ParamObject->GetArray( Param => 'AllowedGroupIDs' );

@@ -8,6 +8,7 @@ Ein Profil kann mehrere Ticketfelder, den Betreff, den Artikeltext und dynamisch
 
 - Agent-only-Widget unterhalb der Kundeninformationen in `AgentTicketPhone`
 - Profile mit frei konfigurierbarem Namen, Label, Beschreibung, Icon, Farbe und Sortierung
+- Konfigurierbare Trennlinien zwischen ausgewählten Profilen
 - Vorausfüllen von Queue, Typ, Service, SLA, Priorität, Status, Besitzer, Verantwortlichem, Betreff, Artikeltext und Zeiteinheiten
 - Unterstützung für dynamische Ticket- und Artikelfelder
 - Platzhalter für Kundenbenutzer, Agenten und Datum/Uhrzeit
@@ -58,7 +59,7 @@ Je nach OTOBO-Navigation ist sie unter `Ticket` → `Quick ticket profiles` erre
 ## Installation über die Kommandozeile
 
 ```bash
-bin/otobo.Console.pl Admin::Package::Install /path/to/AgentQuickTicket-1.0.9.opm
+bin/otobo.Console.pl Admin::Package::Install /path/to/AgentQuickTicket-1.0.18.opm
 bin/otobo.Console.pl Maint::Config::Rebuild
 bin/otobo.Console.pl Maint::Cache::Delete
 ```
@@ -100,6 +101,7 @@ bin/otobo.Console.pl Maint::Cache::Delete
 | Icon | Lokale Font-Awesome-Klasse, zum Beispiel `fa-key` oder `fa-bolt`. |
 | Farbe | Semantische Farbe wie `Primary`, `Success`, `Warning`, `Danger`, `Info`, `Neutral` oder ein Hexwert wie `#336699`. |
 | Sortierung | Reihenfolge der Buttons im Widget. Kleinere Werte werden zuerst angezeigt. |
+| Trennlinie | Mit **Trennlinie vor diesem Profil anzeigen** wird vor diesem Profil eine Linie dargestellt. Sie erscheint nur zwischen sichtbaren Profilen, nie vor dem ersten. |
 | Gültigkeit | Nur gültige Profile werden Agents angeboten. |
 
 Die Icons werden nicht aus dem Internet geladen. Das Plugin verwendet ausschließlich Font-Awesome-Klassen; die zugehörigen CSS- und Font-Dateien kommen aus der lokalen OTOBO-Installation.
@@ -336,7 +338,7 @@ Anschließend Browser mit `Strg+F5` aktualisieren.
 Das Plugin verwendet diese Tabellen:
 
 - `agent_quick_ticket_profile`
-- `agent_quick_ticket_profile_group`
+- `agent_quick_ticket_profile_grp`
 
 Vor einer Deinstallation sollten die Profile exportiert oder dokumentiert werden. Die Paketdeinstallation entfernt die Plugin-Tabellen gemäß OTOBO-Paketdefinition. Vorher ein Datenbankbackup erstellen.
 

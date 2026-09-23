@@ -11,19 +11,19 @@ bin/otobo.Console.pl Dev::Package::Build \
   /tmp
 ```
 
-The result is `/tmp/AgentQuickTicket-1.0.9.opm`.
+The result is `/tmp/AgentQuickTicket-1.0.18.opm`.
 
 ## Install
 
 ```bash
-bin/otobo.Console.pl Admin::Package::Install /tmp/AgentQuickTicket-1.0.9.opm
+bin/otobo.Console.pl Admin::Package::Install /tmp/AgentQuickTicket-1.0.18.opm
 bin/otobo.Console.pl Maint::Config::Rebuild
 bin/otobo.Console.pl Maint::Cache::Delete
 ```
 
 Restart or refresh the agent browser session after the package install. The admin menu entry is under `Ticket` as `Quick ticket profiles`.
 
-The package creates the two tables `agent_quick_ticket_profile` and `agent_quick_ticket_profile_group`. Installation seeds the idempotent demo profile `PasswordReset`; it can also be created or checked later with:
+The package creates the two tables `agent_quick_ticket_profile` and `agent_quick_ticket_profile_grp`. On upgrades, the package also runs an idempotent schema repair, removes orphaned group mappings and then seeds the demo profile. Installation seeds the idempotent demo profile `PasswordReset`; it can also be created or checked later with:
 
 ```bash
 scripts/AgentQuickTicketMigrate.pl --check

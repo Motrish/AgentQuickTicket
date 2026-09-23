@@ -39,7 +39,7 @@ our @ObjectDependencies = (
     'Kernel::System::Valid',
 );
 
-our $VERSION = '1.0.9';
+our $VERSION = '1.0.18';
 
 sub new {
     my ( $Type, %Param ) = @_;
@@ -48,7 +48,7 @@ sub new {
     bless $Self, $Type;
 
     $Self->{TableName} = 'agent_quick_ticket_profile';
-    $Self->{GroupTableName} = 'agent_quick_ticket_profile_group';
+    $Self->{GroupTableName} = 'agent_quick_ticket_profile_grp';
     $Self->{CacheType} = 'AgentQuickTicket';
     $Self->{CacheTTL}  = 60 * 60 * 24;
 
@@ -83,6 +83,9 @@ sub ConfigurationDefaults {
         CustomerScope        => {
             Mode        => 'All',
             CustomerIDs => [],
+        },
+        Presentation         => {
+            SeparatorBefore => 0,
         },
         AllowAllEligibleAgents => 1,
         ConfirmBeforeApply  => 1,
@@ -119,9 +122,18 @@ sub ProfileList {
 
     return [] if !$DBObject->Prepare( SQL => $SQL, Bind => \@Bind );
 
-    my @Profiles;
+    # OTOBO's DB object uses one active result cursor. Read the complete
+    # profile result set before querying group mappings; otherwise the nested
+    # Prepare() in _ProfileGroupIDs() replaces the profile cursor and only the
+    # first profile is returned.
+    my @ProfileRows;
     while ( my @Row = $DBObject->FetchrowArray() ) {
-        my $Profile = $Self->_RowToProfile(\@Row);
+        push @ProfileRows, [@Row];
+    }
+
+    my @Profiles;
+    for my $Row (@ProfileRows) {
+        my $Profile = $Self->_RowToProfile($Row);
         $Profile->{AllowedGroupIDs} = $Self->_ProfileGroupIDs( ID => $Profile->{ID} );
         push @Profiles, $Profile;
     }
@@ -163,6 +175,8 @@ sub ProfileGet {
 sub Create {
     my ( $Self, %Param ) = @_;
 
+    return if !$Self->EnsureDatabaseSchema();
+
     my $Configuration = $Self->ConfigurationNormalize(
         Configuration => $Param{Configuration},
     );
@@ -200,10 +214,18 @@ sub Create {
     }
     return if !$ID;
 
-    return if !$Self->_SaveProfileGroups(
+    if ( !$Self->_SaveProfileGroups(
         ID       => $ID,
         GroupIDs => $Param{GroupIDs} || [],
-    );
+    ) ) {
+        # Do not leave a profile without its group mapping data when a save
+        # fails after the profile row has already been inserted.
+        $DBObject->Do(
+            SQL  => 'DELETE FROM ' . $Self->{TableName} . ' WHERE id = ?',
+            Bind => [ \$ID ],
+        );
+        return;
+    }
 
     $Self->CacheClear();
     return $ID;
@@ -211,6 +233,8 @@ sub Create {
 
 sub Update {
     my ( $Self, %Param ) = @_;
+
+    return if !$Self->EnsureDatabaseSchema();
 
     my $ID = $Param{ID} || 0;
     return if !$ID || $ID !~ /\A\d+\z/;
@@ -287,6 +311,58 @@ sub SetValid {
     return 1;
 }
 
+sub SetSeparatorBefore {
+    my ( $Self, %Param ) = @_;
+
+    my $ID = $Param{ID} || 0;
+    return if !$ID || $ID !~ /\A\d+\z/;
+
+    my $Profile = $Self->ProfileGet( ID => $ID );
+    return if !$Profile;
+
+    my $Configuration = $Profile->{Configuration} || $Self->ConfigurationDefaults();
+    $Configuration->{Presentation} ||= {};
+    $Configuration->{Presentation}{SeparatorBefore} = $Param{Enabled} ? 1 : 0;
+
+    return $Self->Update(
+        ID            => $Profile->{ID},
+        InternalName  => $Profile->{InternalName},
+        Label         => $Profile->{Label},
+        Description   => $Profile->{Description},
+        Icon          => $Profile->{Icon},
+        Color         => $Profile->{Color},
+        SortOrder     => $Profile->{SortOrder},
+        ValidID       => $Profile->{ValidID},
+        Configuration => $Configuration,
+        GroupIDs      => $Profile->{AllowedGroupIDs} || [],
+        UserID        => $Param{UserID} || 1,
+    );
+}
+
+sub EnsureDatabaseSchema {
+    my ( $Self, %Param ) = @_;
+
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # DatabaseInstall is not re-applied by every OTOBO package upgrade. This
+    # idempotent statement repairs installations where the package metadata
+    # was upgraded but the profile-group table was not created.
+    return if !$DBObject->Do(
+        SQL => 'CREATE TABLE IF NOT EXISTS ' . $Self->{GroupTableName}
+            . ' (profile_id INTEGER NOT NULL, group_id INTEGER NOT NULL, '
+            . 'UNIQUE (profile_id, group_id))',
+    );
+
+    # A previously failed save could have inserted a group row after the
+    # profile row was removed. Such rows can never be displayed or resolved.
+    return if !$DBObject->Do(
+        SQL => 'DELETE FROM ' . $Self->{GroupTableName}
+            . ' WHERE profile_id NOT IN (SELECT id FROM ' . $Self->{TableName} . ')',
+    );
+
+    return 1;
+}
+
 sub CacheClear {
     my ( $Self, %Param ) = @_;
 
@@ -340,6 +416,7 @@ sub AgentProfilesGet {
         next PROFILE if @Errors;
 
         my %PublicProfile = %{$Profile};
+        $PublicProfile{SeparatorBefore} = $Profile->{Configuration}{Presentation}{SeparatorBefore} ? 1 : 0;
         $PublicProfile{Configuration} = undef;
         $PublicProfile{ValidationErrors} = [];
         push @Allowed, \%PublicProfile;
@@ -833,6 +910,11 @@ sub ConfigurationNormalize {
     };
     $Configuration->{CustomerScope}{CustomerIDs} = []
         if ref $Configuration->{CustomerScope}{CustomerIDs} ne 'ARRAY';
+    $Configuration->{Presentation} = {
+        %{ $Defaults->{Presentation} },
+        %{ ref $Configuration->{Presentation} eq 'HASH' ? $Configuration->{Presentation} : {} },
+    };
+    $Configuration->{Presentation}{SeparatorBefore} = $Configuration->{Presentation}{SeparatorBefore} ? 1 : 0;
     $Configuration->{ConfirmBeforeApply} = $Configuration->{ConfirmBeforeApply} ? 1 : 0;
     $Configuration->{WarnOnExistingChanges} = $Configuration->{WarnOnExistingChanges} ? 1 : 0;
     $Configuration->{AllowAllEligibleAgents} = $Configuration->{AllowAllEligibleAgents} ? 1 : 0;

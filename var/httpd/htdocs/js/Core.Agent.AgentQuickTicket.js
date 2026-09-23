@@ -15,6 +15,7 @@ Core.Agent.AgentQuickTicket = (function (TargetNS) {
         RefreshTimer: null,
         Request: null
     };
+    var ServiceRefreshParameter = 'AgentQuickTicketServiceRefresh';
 
     function ShowMessage(Message, IsError) {
         var $Message = State.$Widget.find('[data-role="message"]');
@@ -93,6 +94,10 @@ Core.Agent.AgentQuickTicket = (function (TargetNS) {
         return $Button;
     }
 
+    function BuildSeparator() {
+        return $('<div class="AgentQuickTicketSeparator" role="separator"></div>');
+    }
+
     function RenderProfiles(Profiles) {
         ClearButtons();
         State.$Widget.find('[data-role="hint"]').addClass('Hidden');
@@ -104,8 +109,13 @@ Core.Agent.AgentQuickTicket = (function (TargetNS) {
         Profiles.sort(function (A, B) {
             return (parseInt(A.SortOrder, 10) || 0) - (parseInt(B.SortOrder, 10) || 0);
         });
+        var RenderedProfiles = 0;
         Profiles.forEach(function (Profile) {
+            if (RenderedProfiles > 0 && Profile.SeparatorBefore) {
+                State.$Widget.find('[data-role="buttons"]').append(BuildSeparator());
+            }
             State.$Widget.find('[data-role="buttons"]').append(BuildButton(Profile));
+            RenderedProfiles++;
         });
     }
 
@@ -430,6 +440,32 @@ Core.Agent.AgentQuickTicket = (function (TargetNS) {
         var OldExpandCustomerName = $ExpandCustomerName.val();
         $Subaction.val('StoreNew');
         $ExpandCustomerName.val('4');
+
+        // StoreNew renders the submitted profile values but does not run the
+        // ServiceID AJAXUpdate that OTOBO runs after a manual service choice.
+        // Mark this postback so the next page can perform that missing update.
+        try {
+            var TargetURL = new URL(window.location.href);
+            TargetURL.searchParams.set('Action', 'AgentTicketPhone');
+            TargetURL.searchParams.set(ServiceRefreshParameter, '1');
+            TargetURL.hash = '';
+            Form.action = TargetURL.toString();
+        }
+        catch (Error) {
+            // Older browser fallback; OTOBO's supported browsers provide URL.
+            var TargetPath = window.location.pathname
+                + '?Action=AgentTicketPhone&' + ServiceRefreshParameter + '=1';
+            Form.action = TargetPath;
+        }
+
+        // Keep Action explicit in the POST body as well as the query string.
+        // OTOBO's request parser then receives the same frontend module through
+        // either parameter source.
+        var $Action = $Form.find('input[name="Action"]').first();
+        if (!$Action.length) {
+            $Action = $('<input type="hidden" name="Action" />').appendTo($Form);
+        }
+        $Action.val('AgentTicketPhone');
         try {
             // Bypass submit handlers and client-side ticket creation actions.
             HTMLFormElement.prototype.submit.call(Form);
@@ -440,6 +476,30 @@ Core.Agent.AgentQuickTicket = (function (TargetNS) {
         }
     }
 
+    function RefreshServiceAfterPrefill() {
+        var PageURL;
+        try {
+            PageURL = new URL(window.location.href);
+        }
+        catch (Error) {
+            return;
+        }
+        if (PageURL.searchParams.get(ServiceRefreshParameter) !== '1') {
+            return;
+        }
+
+        // Consume the marker before sending the update, so subsequent normal
+        // page loads do not repeat it. Keep the action in the visible URL.
+        PageURL.searchParams.delete(ServiceRefreshParameter);
+        window.history.replaceState(window.history.state, '', PageURL.toString());
+        window.setTimeout(function () {
+            var $Form = $('#NewPhoneTicket');
+            if ($Form.length) {
+                Core.AJAX.FormUpdate($Form, 'AJAXUpdate', 'ServiceID');
+            }
+        }, 0);
+    }
+
     TargetNS.Init = function () {
         var $Widget = $('#AgentQuickTicketWidget');
         if (!$Widget.length || !$Widget.data('agent-quick-ticket-widget')) {
@@ -447,6 +507,7 @@ Core.Agent.AgentQuickTicket = (function (TargetNS) {
         }
         State.$Widget = $Widget;
         $Widget.insertAfter('#CustomerInfo').removeClass('Hidden');
+        RefreshServiceAfterPrefill();
         Core.App.Subscribe('Event.Agent.CustomerSearch.GetCustomerInfo.Callback', LoadProfiles);
         $('#SelectedCustomerUser').on('change', LoadProfiles);
         $(document).on('click', '#RemoveCustomerTicket, .CustomerTicketRemove', function () {

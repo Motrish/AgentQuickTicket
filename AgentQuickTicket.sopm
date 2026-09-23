@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <otobo_package version="1.1">
     <Name>AgentQuickTicket</Name>
-    <Version>1.0.9</Version>
+    <Version>1.0.18</Version>
     <Vendor>Michael Nehmer | Motrish</Vendor>
     <URL>https://github.com/Motrish/AgentQuickTicket</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
@@ -13,6 +13,15 @@
     <PackageAllowDirectUpdate>1</PackageAllowDirectUpdate>
     <Description Lang="en">Configurable agent quick ticket profiles for AgentTicketPhone.</Description>
     <Description Lang="de">Konfigurierbare Schnellticket-Profile für AgentTicketPhone.</Description>
+    <ChangeLog Date="2026-09-23" Version="1.0.18">Run OTOBO's ServiceID AJAXUpdate after a quick ticket profile postback so service-dependent dynamic field ACLs remain active.</ChangeLog>
+    <ChangeLog Date="2026-09-23" Version="1.0.17">Keep the AgentTicketPhone action in the native profile refresh request so action-scoped ACLs continue to apply when dynamic fields change.</ChangeLog>
+    <ChangeLog Date="2026-09-22" Version="1.0.16">Add configurable separator lines before selected profiles in the administration overview and AgentTicketPhone widget.</ChangeLog>
+    <ChangeLog Date="2026-09-21" Version="1.0.15">Read all profiles before loading group mappings so the admin list shows every profile.</ChangeLog>
+    <ChangeLog Date="2026-09-21" Version="1.0.14">Clean orphaned profile-group mappings and roll back incomplete profile creation.</ChangeLog>
+    <ChangeLog Date="2026-09-21" Version="1.0.13">Create the profile-group table during package upgrades when the previous database installation was incomplete.</ChangeLog>
+    <ChangeLog Date="2026-09-21" Version="1.0.12">Use OTOBO-compatible database identifier lengths for all profile tables, constraints and indexes.</ChangeLog>
+    <ChangeLog Date="2026-09-21" Version="1.0.11">Use OTOBO-compatible database identifier lengths for the profile group table and its indexes.</ChangeLog>
+    <ChangeLog Date="2026-09-21" Version="1.0.10">Include the OTOBO challenge token in the administration save form and log failed profile saves.</ChangeLog>
     <ChangeLog Date="2026-09-18" Version="1.0.9">Redraw visible OTOBO Modernize fields after applying a profile so selections such as next ticket state are immediately visible.</ChangeLog>
     <ChangeLog Date="2026-09-18" Version="1.0.8">Rewrite the user documentation with installation, configuration, placeholders, troubleshooting, security and operational guidance.</ChangeLog>
     <ChangeLog Date="2026-09-18" Version="1.0.7">Merge the German AgentQuickTicket translations into the existing OTOBO catalog instead of replacing all core translations.</ChangeLog>
@@ -60,7 +69,7 @@
             <Column Name="create_by" Required="true" Type="INTEGER" />
             <Column Name="change_time" Required="true" Type="DATE" />
             <Column Name="change_by" Required="true" Type="INTEGER" />
-            <Unique Name="agent_quick_ticket_profile_internal_name">
+            <Unique Name="aqt_profile_iname_uniq">
                 <UniqueColumn Name="internal_name" />
             </Unique>
             <ForeignKey ForeignTable="valid">
@@ -71,17 +80,17 @@
                 <Reference Local="change_by" Foreign="id" />
             </ForeignKey>
         </TableCreate>
-        <TableCreate Name="agent_quick_ticket_profile_group">
+        <TableCreate Name="agent_quick_ticket_profile_grp">
             <Column Name="profile_id" Required="true" Type="INTEGER" />
             <Column Name="group_id" Required="true" Type="INTEGER" />
-            <Unique Name="agent_quick_ticket_profile_group_unique">
+            <Unique Name="aqt_profile_grp_uniq">
                 <UniqueColumn Name="profile_id" />
                 <UniqueColumn Name="group_id" />
             </Unique>
-            <Index Name="agent_quick_ticket_profile_group_profile_id">
+            <Index Name="aqt_profile_grp_pid">
                 <IndexColumn Name="profile_id" />
             </Index>
-            <Index Name="agent_quick_ticket_profile_group_group_id">
+            <Index Name="aqt_profile_grp_gid">
                 <IndexColumn Name="group_id" />
             </Index>
             <ForeignKey ForeignTable="agent_quick_ticket_profile">
@@ -94,17 +103,23 @@
     </DatabaseInstall>
 
     <DatabaseUninstall Type="pre">
-        <TableDrop Name="agent_quick_ticket_profile_group" />
+        <TableDrop Name="agent_quick_ticket_profile_grp" />
         <TableDrop Name="agent_quick_ticket_profile" />
     </DatabaseUninstall>
 
     <CodeInstall Type="post"><![CDATA[
-$Kernel::OM->Get('Kernel::System::AgentQuickTicket')->SeedDemoProfile( UserID => 1 );
+my $AgentQuickTicketObject = $Kernel::OM->Get('Kernel::System::AgentQuickTicket');
+$AgentQuickTicketObject->EnsureDatabaseSchema();
+$AgentQuickTicketObject->SeedDemoProfile( UserID => 1 );
     ]]></CodeInstall>
     <CodeUpgrade Type="post"><![CDATA[
-$Kernel::OM->Get('Kernel::System::AgentQuickTicket')->SeedDemoProfile( UserID => 1 );
+my $AgentQuickTicketObject = $Kernel::OM->Get('Kernel::System::AgentQuickTicket');
+$AgentQuickTicketObject->EnsureDatabaseSchema();
+$AgentQuickTicketObject->SeedDemoProfile( UserID => 1 );
     ]]></CodeUpgrade>
     <CodeReinstall Type="post"><![CDATA[
-$Kernel::OM->Get('Kernel::System::AgentQuickTicket')->SeedDemoProfile( UserID => 1 );
+my $AgentQuickTicketObject = $Kernel::OM->Get('Kernel::System::AgentQuickTicket');
+$AgentQuickTicketObject->EnsureDatabaseSchema();
+$AgentQuickTicketObject->SeedDemoProfile( UserID => 1 );
     ]]></CodeReinstall>
 </otobo_package>

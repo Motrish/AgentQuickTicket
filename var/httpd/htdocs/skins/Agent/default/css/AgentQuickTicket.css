@@ -39,6 +39,12 @@
 .AgentQuickTicketButton--Info { background: #269abc; }
 .AgentQuickTicketButton--Neutral { background: #777; }
 
+.AgentQuickTicketSeparator {
+    border-top: 1px solid #c7c7c7;
+    flex: 0 0 100%;
+    margin: 0.35em 0;
+}
+
 .AgentQuickTicketWidget [data-role="message"].Error,
 .AgentQuickTicketTestResult.Error,
 .AgentQuickTicketAdmin .MessageBox.Error {
@@ -57,6 +63,14 @@
 .AgentQuickTicketActions a {
     display: inline-block;
     margin-right: 0.6em;
+}
+
+.AgentQuickTicketSeparatorControl {
+    white-space: nowrap;
+}
+
+.AgentQuickTicketSeparatorControl a {
+    margin-right: 0.35em;
 }
 
 .AgentQuickTicketFieldTable td,

@@ -1,5 +1,45 @@
 # Changelog
 
+## 1.0.18
+
+- Run OTOBO's `AJAXUpdate` for `ServiceID` after a no-submit profile postback. This applies the same service-dependent dynamic-field ACL refresh as selecting a service manually.
+
+## 1.0.17
+
+- Preserve `Action=AgentTicketPhone` in the native profile refresh URL and POST body so action-scoped ACLs remain active when dynamic fields change.
+
+## 1.0.16
+
+- Add configurable separator lines before selected profiles.
+- Add a direct separator toggle to the administration overview.
+- Render separators locally in the AgentTicketPhone widget only between visible profiles.
+
+## 1.0.15
+
+- Fix the profile list cursor handling so all profiles are displayed when group mappings are loaded.
+
+## 1.0.14
+
+- Remove orphaned rows from `agent_quick_ticket_profile_grp` during schema repair.
+- Prevent failed profile creation from leaving an incomplete profile row.
+- Ensure the profile-group table exists before profile creation and updates.
+
+## 1.0.13
+
+- Add an idempotent database schema repair during install, upgrade and reinstall so incomplete earlier installations create `agent_quick_ticket_profile_grp` automatically.
+
+## 1.0.12
+
+- Rename all profile database constraints and indexes to comply with OTOBO's 30-character identifier limit.
+
+## 1.0.11
+
+- Rename the profile-group table and database identifiers to comply with OTOBO's 30-character identifier limit.
+
+## 1.0.10
+
+- Include the OTOBO challenge token in the administration save form and log failed profile saves.
+
 ## 1.0.9
 
 - Redraw visible OTOBO Modernize fields after applying a profile so selections such as next ticket state are immediately visible.

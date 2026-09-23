@@ -43,6 +43,7 @@
                             <th>[% Translate("Allowed agents") | html %]</th>
                             <th>[% Translate("Validity") | html %]</th>
                             <th>[% Translate("Validation") | html %]</th>
+                            <th>[% Translate("Display") | html %]</th>
                             <th>[% Translate("Actions") | html %]</th>
                         </tr>
                     </thead>
@@ -77,6 +78,10 @@
                                     <span class="Error">[% Profile.ValidationText | html %]</span>
                                 [% END %]
                             </td>
+                            <td class="AgentQuickTicketSeparatorControl">
+                                <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=ToggleSeparator;ID=[% Profile.ID | uri %];[% Env("ChallengeTokenParam") | html %]" title="[% IF Profile.SeparatorBefore %][% Translate("Remove separator before this profile") | html %][% ELSE %][% Translate("Add separator before this profile") | html %][% END %]"><i class="fa [% IF Profile.SeparatorBefore %]fa-minus-circle[% ELSE %]fa-plus-circle[% END %]"></i></a>
+                                [% IF Profile.SeparatorBefore %][% Translate("Separator") | html %][% END %]
+                            </td>
                             <td class="AgentQuickTicketActions">
                                 <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Change;ID=[% Profile.ID | uri %]" title="[% Translate("Edit") | html %]"><i class="fa fa-pencil"></i></a>
                                 <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Copy;ID=[% Profile.ID | uri %];[% Env("ChallengeTokenParam") | html %]" title="[% Translate("Copy") | html %]"><i class="fa fa-copy"></i></a>
@@ -87,7 +92,7 @@
 [% END %]
 [% ELSE %]
                         <tr>
-                            <td colspan="7">[% Translate("No quick ticket profiles are configured.") | html %]</td>
+                            <td colspan="8">[% Translate("No quick ticket profiles are configured.") | html %]</td>
                         </tr>
 [% END %]
                     </tbody>

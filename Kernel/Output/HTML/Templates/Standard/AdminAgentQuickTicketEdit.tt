@@ -61,6 +61,7 @@
                     <input type="hidden" name="Action" value="[% Env("Action") %]"/>
                     <input type="hidden" name="Subaction" value="[% Data.Action | html %]Action"/>
                     <input type="hidden" name="ID" value="[% Data.ID | html %]"/>
+                    <input type="hidden" name="ChallengeToken" value="[% Env("ChallengeToken") | html %]"/>
                     <input type="hidden" name="DynamicFieldsJSON" id="DynamicFieldsJSON" value="[% Data.DynamicFieldsJSON | html %]"/>
                     <fieldset class="TableLike">
                         <legend>[% Translate("Basic data") | html %]</legend>
@@ -110,6 +111,16 @@
                                 <option value="1" [% IF Data.ValidID == 1 %]selected="selected"[% END %]>[% Translate("valid") | html %]</option>
                                 <option value="2" [% IF Data.ValidID == 2 %]selected="selected"[% END %]>[% Translate("invalid") | html %]</option>
                             </select>
+                        </div>
+                        <div class="Clear"></div>
+                    </fieldset>
+
+                    <fieldset class="TableLike">
+                        <legend>[% Translate("Display") | html %]</legend>
+                        <label for="SeparatorBefore">[% Translate("Separator") | html %]:</label>
+                        <div class="Field">
+                            <label for="SeparatorBefore" class="CheckboxLabel"><input type="checkbox" name="SeparatorBefore" id="SeparatorBefore" value="1" [% Data.SeparatorBeforeChecked | html %]/> [% Translate("Show a separator before this profile") | html %]</label>
+                            <p class="FieldHelp">[% Translate("The separator is shown between visible profiles in AgentTicketPhone. It is never shown before the first visible profile.") | html %]</p>
                         </div>
                         <div class="Clear"></div>
                     </fieldset>

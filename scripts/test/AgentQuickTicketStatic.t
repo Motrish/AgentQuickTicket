@@ -38,6 +38,7 @@ for my $Relative (@Required) {
 
 my $SOPM = File::Spec->catfile( $Root, 'AgentQuickTicket.sopm' );
 my $XMLModule = File::Spec->catfile( $Root, 'Kernel', 'Config', 'Files', 'XML', 'AgentQuickTicket.xml' );
+my $AdminEditTemplate = File::Spec->catfile( $Root, 'Kernel', 'Output', 'HTML', 'Templates', 'Standard', 'AdminAgentQuickTicketEdit.tt' );
 
 SKIP: {
     eval { require XML::LibXML; 1 } or skip 'XML::LibXML is not installed', 4;
@@ -61,6 +62,43 @@ close $Handle;
 like( $Core, qr/CustomerFullname/, 'customer placeholder is implemented' );
 like( $Core, qr/QueueCreateAllowed/, 'queue create permission check is implemented' );
 like( $Core, qr/ConfirmBeforeApply/, 'apply confirmation is implemented' );
+like( $Core, qr/our \$VERSION = '1\.0\.18'/, 'core module version is 1.0.18' );
+like( $Core, qr/Presentation\s*=>\s*\{\s*SeparatorBefore\s*=>\s*0/s, 'separator presentation has a backward-compatible default' );
+like( $Core, qr/sub\s+SetSeparatorBefore\s*\{/, 'separator setting has a persistence method' );
+like( $Core, qr/\$PublicProfile\{SeparatorBefore\}\s*=\s*\$Profile->\{Configuration\}\{Presentation\}\{SeparatorBefore\}/, 'public profiles expose separator state' );
+like( $Core, qr/GroupTableName\}\s*=\s*'agent_quick_ticket_profile_grp'/, 'profile group table uses the OTOBO-compatible name' );
+like( $Core, qr/sub\s+EnsureDatabaseSchema\s*\{/, 'database schema repair method is implemented' );
+like( $Core, qr/CREATE TABLE IF NOT EXISTS/, 'database schema repair is idempotent' );
+like( $Core, qr/profile_id NOT IN \(SELECT id FROM/, 'orphaned group mappings are removed during schema repair' );
+like( $Core, qr/Do not leave a profile without its group mapping data/, 'failed profile creation is rolled back' );
+like( $Core, qr/my \@ProfileRows;/, 'profile rows are buffered before nested group queries' );
+like( $Core, qr/for my \$Row \(\@ProfileRows\)/, 'group mappings are loaded after the profile result set' );
+
+open my $SOPMHandle, '<', $SOPM
+    or die "Cannot read SOPM: $!";
+local $/;
+my $SOPMText = <$SOPMHandle>;
+close $SOPMHandle;
+
+like( $SOPMText, qr/Unique Name="aqt_profile_iname_uniq"/, 'profile name constraint uses the OTOBO-compatible name' );
+like( $SOPMText, qr/Index Name="aqt_profile_grp_pid"/, 'profile group profile index uses the OTOBO-compatible name' );
+like( $SOPMText, qr/Index Name="aqt_profile_grp_gid"/, 'profile group group index uses the OTOBO-compatible name' );
+
+open my $AdminEditHandle, '<', $AdminEditTemplate
+    or die "Cannot read admin edit template: $!";
+local $/;
+my $AdminEditTemplateText = <$AdminEditHandle>;
+close $AdminEditHandle;
+
+like( $AdminEditTemplateText, qr/name="ChallengeToken" value="\[% Env\("ChallengeToken"\)/, 'admin save form includes the OTOBO challenge token' );
+like( $AdminEditTemplateText, qr/name="SeparatorBefore"/, 'admin edit form includes the separator setting' );
+
+open my $AdminOverviewHandle, '<', File::Spec->catfile( $Root, 'Kernel', 'Output', 'HTML', 'Templates', 'Standard', 'AdminAgentQuickTicket.tt' )
+    or die "Cannot read admin overview template: $!";
+local $/;
+my $AdminOverviewTemplate = <$AdminOverviewHandle>;
+close $AdminOverviewHandle;
+like( $AdminOverviewTemplate, qr/Subaction=ToggleSeparator/, 'admin overview provides a separator toggle' );
 
 open my $GermanLanguageHandle, '<', File::Spec->catfile( $Root, 'Kernel', 'Language', 'de_AgentQuickTicket.pm' )
     or die "Cannot read German language extension: $!";
@@ -96,8 +134,21 @@ like( $AgentJS, qr/hasOwnProperty\.call\(Prefill, 'Body'\)/, 'article-text profi
 like( $AgentJS, qr/name="ExpandCustomerName"/, 'prefill refresh targets the AgentTicketPhone no-submit field' );
 like( $AgentJS, qr/\$ExpandCustomerName\.val\('4'\)/, 'prefill refresh uses the no-submit AgentTicketPhone path' );
 like( $AgentJS, qr/HTMLFormElement\.prototype\.submit\.call/, 'prefill refresh uses native form submission' );
+like( $AgentJS, qr/TargetURL\.searchParams\.set\('Action', 'AgentTicketPhone'\)/, 'native refresh URL preserves AgentTicketPhone action for ACL matching' );
+like( $AgentJS, qr/\$Action\.val\('AgentTicketPhone'\)/, 'native refresh POST body preserves AgentTicketPhone action' );
+like( $AgentJS, qr/TargetURL\.searchParams\.set\(ServiceRefreshParameter, '1'\)/, 'profile postback marks the missing service refresh' );
+like( $AgentJS, qr/Core\.AJAX\.FormUpdate\(\$Form, 'AJAXUpdate', 'ServiceID'\)/, 'postback runs OTOBO service dependency refresh' );
 like( $AgentJS, qr/trigger\('redraw\.InputField'\)/, 'visible Modernize fields are redrawn after profile application' );
 like( $AgentJS, qr/trigger\('change'\)/, 'OTOBO change handlers are notified after profile application' );
+like( $AgentJS, qr/BuildSeparator/, 'widget builds a local separator element' );
+like( $AgentJS, qr/RenderedProfiles > 0 && Profile\.SeparatorBefore/, 'widget does not render a separator before the first visible profile' );
+
+open my $CSSHandle, '<', File::Spec->catfile( $Root, 'var', 'httpd', 'htdocs', 'skins', 'Agent', 'default', 'css', 'AgentQuickTicket.css' )
+    or die "Cannot read AgentQuickTicket CSS: $!";
+local $/;
+my $CSS = <$CSSHandle>;
+close $CSSHandle;
+like( $CSS, qr/\.AgentQuickTicketSeparator\s*\{/, 'widget separator has local CSS' );
 
 open my $ControllerHandle, '<', File::Spec->catfile( $Root, 'Kernel', 'Modules', 'AgentQuickTicket.pm' )
     or die "Cannot read controller: $!";
@@ -106,5 +157,14 @@ my $Controller = <$ControllerHandle>;
 close $ControllerHandle;
 
 like( $Controller, qr/ResolveProfile failed/, 'ResolveProfile exceptions are logged' );
+
+open my $AdminControllerHandle, '<', File::Spec->catfile( $Root, 'Kernel', 'Modules', 'AdminAgentQuickTicket.pm' )
+    or die "Cannot read admin controller: $!";
+local $/;
+my $AdminController = <$AdminControllerHandle>;
+close $AdminControllerHandle;
+
+like( $AdminController, qr/profile save failed/, 'profile save failures are logged' );
+like( $AdminController, qr/Subaction eq 'ToggleSeparator'/, 'admin controller handles separator toggling' );
 
 done_testing();

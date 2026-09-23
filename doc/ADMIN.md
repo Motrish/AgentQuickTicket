@@ -16,6 +16,12 @@ Customer scope can be `All` or a list of customer logins/customer IDs. The scope
 
 The queue field is translated back to OTOBO's `Dest` format (`QueueID||QueueName`). The profile is applied to the regular form, so attachments and other current form data remain available and the agent can review the result before submitting.
 
+## Display separators
+
+The **Display** section of a profile provides **Show a separator before this profile**. The same setting can be toggled directly in the profile overview with the plus/minus separator icon. The setting belongs to the profile that follows the separator and is stored inside the profile configuration; no additional database column or table is required.
+
+In `AgentTicketPhone`, separators are rendered only between profiles that are actually visible to the current agent and customer user. A separator is never rendered before the first visible profile. Sorting is still controlled by the profile's **Sort order** value.
+
 ## Placeholders
 
 The following placeholders are accepted in text values:
