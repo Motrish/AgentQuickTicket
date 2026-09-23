@@ -382,6 +382,6 @@ node --check var/httpd/htdocs/js/Core.Agent.Admin.AgentQuickTicket.js
 - Repository: https://github.com/Motrish/AgentQuickTicket
 - Vendor: Michael Nehmer | Motrish
 - Lizenz: GNU GPLv3
-- Changelog: [`doc/AgentQuickTicket/CHANGELOG.md`](doc/AgentQuickTicket/CHANGELOG.md)
-- Administrationsdetails: [`doc/AgentQuickTicket/ADMIN.md`](doc/AgentQuickTicket/ADMIN.md)
-- Installationsdetails: [`doc/AgentQuickTicket/INSTALL.md`](doc/AgentQuickTicket/INSTALL.md)
+- Changelog: [`CHANGELOG.md`](CHANGELOG.md)
+- Administrationsdetails: [`ADMIN.md`](ADMIN.md)
+- Installationsdetails: [`INSTALL.md`](INSTALL.md)

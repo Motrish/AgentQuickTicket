@@ -12,10 +12,10 @@ my $Root = File::Spec->rel2abs( File::Spec->catdir( $Bin, '..', '..' ) );
 my @Required = qw(
     AgentQuickTicket.sopm
     README.md
-    doc/README.md
-    doc/INSTALL.md
-    doc/ADMIN.md
-    doc/CHANGELOG.md
+    doc/AgentQuickTicket/README.md
+    doc/AgentQuickTicket/INSTALL.md
+    doc/AgentQuickTicket/ADMIN.md
+    doc/AgentQuickTicket/CHANGELOG.md
     Kernel/Config/Files/XML/AgentQuickTicket.xml
     Kernel/Language/de_AgentQuickTicket.pm
     Kernel/Language/en_AgentQuickTicket.pm
@@ -62,7 +62,7 @@ close $Handle;
 like( $Core, qr/CustomerFullname/, 'customer placeholder is implemented' );
 like( $Core, qr/QueueCreateAllowed/, 'queue create permission check is implemented' );
 like( $Core, qr/ConfirmBeforeApply/, 'apply confirmation is implemented' );
-like( $Core, qr/our \$VERSION = '1\.0\.18'/, 'core module version is 1.0.18' );
+like( $Core, qr/our \$VERSION = '1\.0\.19'/, 'core module version is 1.0.19' );
 like( $Core, qr/Presentation\s*=>\s*\{\s*SeparatorBefore\s*=>\s*0/s, 'separator presentation has a backward-compatible default' );
 like( $Core, qr/sub\s+SetSeparatorBefore\s*\{/, 'separator setting has a persistence method' );
 like( $Core, qr/\$PublicProfile\{SeparatorBefore\}\s*=\s*\$Profile->\{Configuration\}\{Presentation\}\{SeparatorBefore\}/, 'public profiles expose separator state' );

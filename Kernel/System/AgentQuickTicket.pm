@@ -39,7 +39,7 @@ our @ObjectDependencies = (
     'Kernel::System::Valid',
 );
 
-our $VERSION = '1.0.18';
+our $VERSION = '1.0.19';
 
 sub new {
     my ( $Type, %Param ) = @_;
